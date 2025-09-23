@@ -1,40 +1,23 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
     },
     {
-      "src": "public/**",
-      "use": "@vercel/static"
+      "source": "/",
+      "destination": "/public/index.html"
+    },
+    {
+      "source": "/sox-auditor.html",
+      "destination": "/public/sox-auditor.html"
+    },
+    {
+      "source": "/big4-reviewer.html",
+      "destination": "/public/big4-reviewer.html"
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/sox-auditor.html",
-      "dest": "/public/sox-auditor.html"
-    },
-    {
-      "src": "/big4-reviewer.html", 
-      "dest": "/public/big4-reviewer.html"
-    },
-    {
-      "src": "/",
-      "dest": "/public/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1"
-    }
-  ],
-  "env": {
-    "OPENAI_API_KEY": "@openai_api_key"
-  },
   "functions": {
     "api/**/*.js": {
       "maxDuration": 30
