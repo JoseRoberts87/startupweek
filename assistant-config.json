@@ -1,0 +1,8 @@
+{
+  "assistantId": "asst_s22c5q7ovqssrdnzBi30fFaT",
+  "name": "Helpful Assistant",
+  "model": "gpt-3.5-turbo",
+  "instructions": "You are a helpful, professional assistant. Provide clear, concise, and accurate responses. Be friendly but professional in your tone. If you're unsure about something, be honest about it.",
+  "tools": [],
+  "createdAt": "2025-09-23T14:40:26.351Z"
+}
