@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenAI Assistant</title>
+    <title>OpenAI Assistants Hub</title>
     <style>
         * {
             margin: 0;
@@ -15,319 +15,317 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
 
         .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 600px;
-            height: 80vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
             text-align: center;
+            color: white;
+            margin-bottom: 50px;
         }
 
         .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        .assistants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .assistant-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .assistant-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .assistant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .assistant-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 30px;
+        }
+
+        .assistant-name {
             font-size: 24px;
             font-weight: 600;
-        }
-
-        .status {
-            padding: 10px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-            text-align: center;
-            font-size: 14px;
-        }
-
-        .status.connected {
-            color: #28a745;
-        }
-
-        .status.disconnected {
-            color: #dc3545;
-        }
-
-        .chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .message {
-            display: flex;
-            gap: 10px;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .message.user {
-            justify-content: flex-end;
-        }
-
-        .message-content {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 18px;
-            word-wrap: break-word;
-        }
-
-        .message.user .message-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .message.assistant .message-content {
-            background: #f1f3f5;
             color: #333;
+            margin-bottom: 10px;
         }
 
-        .message.error .message-content {
-            background: #ffe0e0;
-            color: #d32f2f;
+        .assistant-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
         }
 
-        .input-container {
-            padding: 20px;
-            border-top: 1px solid #e9ecef;
+        .assistant-details {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .input-container input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 25px;
-            font-size: 16px;
-            outline: none;
-            transition: border-color 0.3s;
+        .detail-badge {
+            background: #f1f3f5;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #495057;
         }
 
-        .input-container input:focus {
-            border-color: #667eea;
-        }
-
-        .input-container button {
-            padding: 12px 24px;
+        .launch-button {
+            width: 100%;
+            padding: 12px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 25px;
+            border-radius: 10px;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .input-container button:hover {
+        .launch-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
         }
 
-        .input-container button:active {
-            transform: translateY(0);
+        .status-bar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .input-container button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+            }
         }
 
         .loading {
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-            position: relative;
+            text-align: center;
+            color: white;
+            font-size: 20px;
+            padding: 50px;
         }
 
-        .loading span {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #667eea;
-            position: absolute;
-            animation: bounce 1.4s infinite ease-in-out both;
+        .error {
+            background: #ffe0e0;
+            color: #d32f2f;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
         }
 
-        .loading span:nth-child(1) {
-            left: 0;
-            animation-delay: -0.32s;
+        .empty-state {
+            text-align: center;
+            color: white;
+            padding: 50px;
         }
 
-        .loading span:nth-child(2) {
-            left: 16px;
-            animation-delay: -0.16s;
+        .empty-state h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
         }
 
-        .loading span:nth-child(3) {
-            left: 32px;
-            animation-delay: 0;
-        }
-
-        @keyframes bounce {
-            0%, 80%, 100% {
-                transform: scale(0);
-            }
-            40% {
-                transform: scale(1);
-            }
+        .deployment-info {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>OpenAI Assistant</h1>
+            <h1>🤖 Assistant Hub</h1>
+            <p>Select an assistant to start a conversation</p>
         </div>
-        <div class="status" id="status">Checking connection...</div>
-        <div class="chat-container" id="chatContainer"></div>
-        <div class="input-container">
-            <input 
-                type="text" 
-                id="messageInput" 
-                placeholder="Type your message..." 
-                autocomplete="off"
-            />
-            <button id="sendButton">Send</button>
+
+        <div class="status-bar" id="statusBar">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span id="statusText">Connecting to server...</span>
+            </div>
+            <div id="assistantCount"></div>
+        </div>
+
+        <div id="content">
+            <div class="loading">Loading assistants...</div>
+        </div>
+
+        <div class="deployment-info">
+            <p>Powered by OpenAI Assistants API | Deployed on Vercel</p>
         </div>
     </div>
 
     <script>
-        const chatContainer = document.getElementById('chatContainer');
-        const messageInput = document.getElementById('messageInput');
-        const sendButton = document.getElementById('sendButton');
-        const statusDiv = document.getElementById('status');
-        
-        let conversationHistory = [];
-        let isProcessing = false;
+        const statusText = document.getElementById('statusText');
+        const assistantCount = document.getElementById('assistantCount');
+        const content = document.getElementById('content');
 
-        async function checkHealth() {
+        const assistantIcons = {
+            'sox-auditor': '📊',
+            'big4-reviewer': '🔍',
+            'default': '🤖'
+        };
+
+        async function loadAssistants() {
             try {
-                const response = await fetch('/api/health');
-                const data = await response.json();
-                
-                if (data.status === 'ok') {
-                    statusDiv.className = 'status connected';
-                    statusDiv.textContent = data.apiKeyConfigured 
-                        ? 'Connected - Ready to chat' 
-                        : 'Connected - API key not configured';
-                    sendButton.disabled = !data.apiKeyConfigured;
+                // Check health
+                const healthResponse = await fetch('/api/health');
+                const health = await healthResponse.json();
+
+                if (!health.apiKeyConfigured) {
+                    statusText.textContent = 'API Key not configured';
+                    content.innerHTML = '<div class="error">OpenAI API key is not configured. Please check your environment variables.</div>';
+                    return;
                 }
-            } catch (error) {
-                statusDiv.className = 'status disconnected';
-                statusDiv.textContent = 'Disconnected - Server not responding';
-                sendButton.disabled = true;
-            }
-        }
 
-        function addMessage(content, type) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            
-            if (type === 'loading') {
-                contentDiv.innerHTML = '<div class="loading"><span></span><span></span><span></span></div>';
-            } else {
-                contentDiv.textContent = content;
-            }
-            
-            messageDiv.appendChild(contentDiv);
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            
-            return messageDiv;
-        }
+                statusText.textContent = `Connected (${health.environment || 'local'})`;
+                
+                // Load assistants
+                const response = await fetch('/api/assistants/list');
+                const data = await response.json();
+                const assistants = data.assistants;
 
-        async function sendMessage() {
-            const message = messageInput.value.trim();
-            if (!message || isProcessing) return;
-            
-            isProcessing = true;
-            sendButton.disabled = true;
-            messageInput.disabled = true;
-            
-            addMessage(message, 'user');
-            conversationHistory.push({ role: 'user', content: message });
-            
-            messageInput.value = '';
-            
-            const loadingMessage = addMessage('', 'loading');
-            
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message,
-                        conversationHistory: conversationHistory.slice(-10)
-                    }),
+                if (!assistants || assistants.length === 0) {
+                    content.innerHTML = `
+                        <div class="empty-state">
+                            <h2>No Assistants Configured</h2>
+                            <p>Please set up assistant IDs in environment variables</p>
+                            <p style="margin-top: 20px; font-size: 14px;">
+                                Required: SOX_ASSISTANT_ID and BIG4_ASSISTANT_ID
+                            </p>
+                        </div>
+                    `;
+                    assistantCount.textContent = '0 assistants available';
+                    return;
+                }
+
+                assistantCount.textContent = `${assistants.length} assistant${assistants.length > 1 ? 's' : ''} available`;
+
+                // Create assistant cards
+                const grid = document.createElement('div');
+                grid.className = 'assistants-grid';
+
+                assistants.forEach(assistant => {
+                    const card = createAssistantCard(assistant);
+                    grid.appendChild(card);
                 });
-                
-                const data = await response.json();
-                
-                loadingMessage.remove();
-                
-                if (response.ok) {
-                    addMessage(data.response, 'assistant');
-                    conversationHistory.push({ role: 'assistant', content: data.response });
-                } else {
-                    addMessage(data.error || 'An error occurred', 'error');
-                }
+
+                content.innerHTML = '';
+                content.appendChild(grid);
+
             } catch (error) {
-                loadingMessage.remove();
-                addMessage('Failed to connect to server', 'error');
-            } finally {
-                isProcessing = false;
-                sendButton.disabled = false;
-                messageInput.disabled = false;
-                messageInput.focus();
+                console.error('Error loading assistants:', error);
+                statusText.textContent = 'Connection failed';
+                content.innerHTML = '<div class="error">Failed to load assistants. Please check if the server is running.</div>';
             }
         }
 
-        sendButton.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
+        function createAssistantCard(assistant) {
+            const card = document.createElement('div');
+            card.className = 'assistant-card';
+            
+            const icon = assistantIcons[assistant.key] || assistantIcons.default;
+            
+            card.innerHTML = `
+                <div class="assistant-icon">${icon}</div>
+                <h2 class="assistant-name">${assistant.name}</h2>
+                <p class="assistant-description">${assistant.description || 'AI Assistant'}</p>
+                <div class="assistant-details">
+                    <span class="detail-badge">Model: ${assistant.model}</span>
+                    <span class="detail-badge">ID: ${assistant.key}</span>
+                </div>
+                <button class="launch-button" onclick="launchAssistant('${assistant.key}')">
+                    Launch Assistant
+                </button>
+            `;
 
-        checkHealth();
-        setInterval(checkHealth, 30000);
+            return card;
+        }
 
-        messageInput.focus();
+        function launchAssistant(assistantKey) {
+            // Navigate to assistant-specific UI
+            window.location.href = `/${assistantKey}.html`;
+        }
+
+        // Load assistants on page load
+        loadAssistants();
+
+        // Refresh every 30 seconds
+        setInterval(loadAssistants, 30000);
     </script>
 </body>
 </html>

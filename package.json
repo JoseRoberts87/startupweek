@@ -1,8 +1,8 @@
 {
   "name": "openai-assistant",
   "version": "1.0.0",
-  "description": "Basic OpenAI Assistant",
-  "main": "server.js",
+  "description": "OpenAI Assistants Hub - SOX Auditor & Big 4 Reviewer",
+  "main": "api/health.js",
   "type": "module",
   "scripts": {
     "start": "node src/servers/multi-assistant-server.js",

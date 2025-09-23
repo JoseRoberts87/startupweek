@@ -17,7 +17,9 @@
       "Bash(node:*)",
       "Bash(npm run start:assistant:*)",
       "Bash(cp:*)",
-      "Bash(npm run setup:big4:*)"
+      "Bash(npm run setup:big4:*)",
+      "Bash(npm install:*)",
+      "Bash(vercel dev:*)"
     ],
     "deny": [],
     "ask": []
