@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Assistants Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        .assistants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .assistant-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .assistant-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .assistant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .assistant-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 30px;
+        }
+
+        .assistant-name {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .assistant-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .assistant-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .detail-badge {
+            background: #f1f3f5;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #495057;
+        }
+
+        .launch-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .launch-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .status-bar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+            }
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 20px;
+            padding: 50px;
+        }
+
+        .error {
+            background: #ffe0e0;
+            color: #d32f2f;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: white;
+            padding: 50px;
+        }
+
+        .empty-state h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Assistant Hub</h1>
+            <p>Select an assistant to start a conversation</p>
+        </div>
+
+        <div class="status-bar" id="statusBar">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span id="statusText">Connecting to server...</span>
+            </div>
+            <div id="assistantCount"></div>
+        </div>
+
+        <div id="content">
+            <div class="loading">Loading assistants...</div>
+        </div>
+    </div>
+
+    <script>
+        const statusText = document.getElementById('statusText');
+        const assistantCount = document.getElementById('assistantCount');
+        const content = document.getElementById('content');
+
+        const assistantIcons = {
+            'sox-auditor': '📊',
+            'default': '🤖'
+        };
+
+        async function loadAssistants() {
+            try {
+                // Check health
+                const healthResponse = await fetch('/api/health');
+                const health = await healthResponse.json();
+
+                if (!health.apiKeyConfigured) {
+                    statusText.textContent = 'API Key not configured';
+                    content.innerHTML = '<div class="error">OpenAI API key is not configured. Please check your .env file.</div>';
+                    return;
+                }
+
+                statusText.textContent = 'Connected';
+                
+                // Load assistants
+                const response = await fetch('/api/assistants');
+                const data = await response.json();
+                const assistants = data.assistants;
+
+                if (!assistants || assistants.length === 0) {
+                    content.innerHTML = `
+                        <div class="empty-state">
+                            <h2>No Assistants Found</h2>
+                            <p>Please configure assistants first</p>
+                        </div>
+                    `;
+                    assistantCount.textContent = '0 assistants available';
+                    return;
+                }
+
+                assistantCount.textContent = `${assistants.length} assistant${assistants.length > 1 ? 's' : ''} available`;
+
+                // Create assistant cards
+                const grid = document.createElement('div');
+                grid.className = 'assistants-grid';
+
+                assistants.forEach(assistant => {
+                    const card = createAssistantCard(assistant);
+                    grid.appendChild(card);
+                });
+
+                content.innerHTML = '';
+                content.appendChild(grid);
+
+            } catch (error) {
+                console.error('Error loading assistants:', error);
+                statusText.textContent = 'Connection failed';
+                content.innerHTML = '<div class="error">Failed to load assistants. Please check if the server is running.</div>';
+            }
+        }
+
+        function createAssistantCard(assistant) {
+            const card = document.createElement('div');
+            card.className = 'assistant-card';
+            
+            const icon = assistantIcons[assistant.key] || assistantIcons.default;
+            
+            card.innerHTML = `
+                <div class="assistant-icon">${icon}</div>
+                <h2 class="assistant-name">${assistant.name}</h2>
+                <p class="assistant-description">${assistant.description || 'AI Assistant'}</p>
+                <div class="assistant-details">
+                    <span class="detail-badge">Model: ${assistant.model}</span>
+                    <span class="detail-badge">ID: ${assistant.key}</span>
+                </div>
+                <button class="launch-button" onclick="launchAssistant('${assistant.key}')">
+                    Launch Assistant
+                </button>
+            `;
+
+            return card;
+        }
+
+        function launchAssistant(assistantKey) {
+            // Navigate to assistant-specific UI
+            window.location.href = `/assistant/${assistantKey}`;
+        }
+
+        // Load assistants on page load
+        loadAssistants();
+
+        // Refresh every 30 seconds
+        setInterval(loadAssistants, 30000);
+    </script>
+</body>
+</html>

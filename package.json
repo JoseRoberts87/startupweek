@@ -5,11 +5,15 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "start:assistant": "node server-assistant.js",
-    "dev": "node --watch server.js",
-    "dev:assistant": "node --watch server-assistant.js",
-    "setup": "node assistant-setup.js"
+    "start": "node src/servers/multi-assistant-server.js",
+    "start:legacy": "node server.js",
+    "start:single": "node server-assistant.js",
+    "dev": "node --watch src/servers/multi-assistant-server.js",
+    "dev:legacy": "node --watch server.js",
+    "dev:single": "node --watch server-assistant.js",
+    "setup": "node assistant-setup.js",
+    "setup:sox": "node assistants/sox-auditor/setup.js",
+    "setup:big4": "node assistants/big4-reviewer/setup.js"
   },
   "dependencies": {
     "openai": "^4.72.0",

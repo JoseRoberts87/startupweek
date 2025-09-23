@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 800px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-info {
+            flex: 1;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .assistant-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .status {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .thread-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .thread-controls button {
+            padding: 5px 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .thread-controls button:hover {
+            background: #5567d8;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .message.assistant .message-content {
+            background: #f1f3f5;
+            color: #333;
+        }
+
+        .message.system .message-content {
+            background: #fff3cd;
+            color: #856404;
+            font-size: 14px;
+            max-width: 100%;
+            text-align: center;
+        }
+
+        .message.error .message-content {
+            background: #ffe0e0;
+            color: #d32f2f;
+        }
+
+        .message-label {
+            font-size: 11px;
+            color: #6c757d;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .input-container {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-container textarea {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+            resize: none;
+            font-family: inherit;
+            min-height: 50px;
+            max-height: 150px;
+        }
+
+        .input-container textarea:focus {
+            border-color: #667eea;
+        }
+
+        .input-container button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .input-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .input-container button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            position: relative;
+        }
+
+        .loading span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #667eea;
+            position: absolute;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading span:nth-child(1) {
+            left: 0;
+            animation-delay: -0.32s;
+        }
+
+        .loading span:nth-child(2) {
+            left: 16px;
+            animation-delay: -0.16s;
+        }
+
+        .loading span:nth-child(3) {
+            left: 32px;
+            animation-delay: 0;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        .code-block {
+            background: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 10px 0;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-info">
+                <h1 id="assistantName">Loading...</h1>
+                <div class="assistant-info" id="assistantInfo"></div>
+            </div>
+            <button class="back-button" onclick="window.location.href='/'">← Back to Hub</button>
+        </div>
+        
+        <div class="status" id="status">
+            <span id="statusText">Initializing...</span>
+            <div class="thread-controls">
+                <button id="newThreadBtn" title="Start a new conversation">New Thread</button>
+                <button id="clearBtn" title="Clear current conversation">Clear</button>
+            </div>
+        </div>
+        
+        <div class="chat-container" id="chatContainer"></div>
+        
+        <div class="input-container">
+            <textarea 
+                id="messageInput" 
+                placeholder="Type your message..." 
+                autocomplete="off"
+                rows="1"
+            ></textarea>
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const statusText = document.getElementById('statusText');
+        const assistantName = document.getElementById('assistantName');
+        const assistantInfo = document.getElementById('assistantInfo');
+        const newThreadBtn = document.getElementById('newThreadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        
+        // Get assistant key from URL
+        const pathParts = window.location.pathname.split('/');
+        const assistantKey = pathParts[pathParts.length - 1];
+        
+        let sessionId = generateSessionId();
+        let threadId = null;
+        let isProcessing = false;
+        let assistantDetails = null;
+
+        function generateSessionId() {
+            return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        async function loadAssistantInfo() {
+            try {
+                const response = await fetch(`/api/assistants/${assistantKey}/info`);
+                if (response.ok) {
+                    assistantDetails = await response.json();
+                    assistantName.textContent = assistantDetails.name || 'Assistant';
+                    assistantInfo.textContent = `${assistantDetails.description || ''} | Model: ${assistantDetails.model}`;
+                    document.title = assistantDetails.name || 'Assistant Chat';
+                } else {
+                    assistantName.textContent = 'Assistant Not Found';
+                    assistantInfo.textContent = 'Failed to load assistant information';
+                }
+            } catch (error) {
+                assistantInfo.textContent = 'Error loading assistant info';
+            }
+        }
+
+        async function checkHealth() {
+            try {
+                const response = await fetch(`/api/assistants/${assistantKey}/health`);
+                const data = await response.json();
+                
+                if (data.status === 'ok') {
+                    statusText.textContent = `Connected | Thread: ${threadId ? threadId.slice(-8) : 'New'}`;
+                    sendButton.disabled = false;
+                } else {
+                    statusText.textContent = 'Assistant not available';
+                    sendButton.disabled = true;
+                }
+            } catch (error) {
+                statusText.textContent = 'Connection lost';
+                sendButton.disabled = true;
+            }
+        }
+
+        function formatMessage(content) {
+            // Check if content contains JSON
+            if (content.includes('```json')) {
+                return content.replace(/```json\n([\s\S]*?)```/g, (match, p1) => {
+                    try {
+                        const json = JSON.parse(p1);
+                        return '<pre class="code-block">' + JSON.stringify(json, null, 2) + '</pre>';
+                    } catch (e) {
+                        return '<pre class="code-block">' + p1 + '</pre>';
+                    }
+                });
+            }
+            return content;
+        }
+
+        function addMessage(content, type, label = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const contentWrapper = document.createElement('div');
+            
+            if (label) {
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'message-label';
+                labelDiv.textContent = label;
+                contentWrapper.appendChild(labelDiv);
+            }
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            if (type === 'loading') {
+                contentDiv.innerHTML = '<div class="loading"><span></span><span></span><span></span></div>';
+            } else {
+                contentDiv.innerHTML = formatMessage(content);
+            }
+            
+            contentWrapper.appendChild(contentDiv);
+            messageDiv.appendChild(contentWrapper);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            
+            return messageDiv;
+        }
+
+        async function createNewThread() {
+            try {
+                const response = await fetch(`/api/assistants/${assistantKey}/threads/new`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ sessionId }),
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    threadId = data.threadId;
+                    chatContainer.innerHTML = '';
+                    addMessage('New conversation started', 'system');
+                    await checkHealth();
+                }
+            } catch (error) {
+                addMessage('Failed to create new thread', 'error');
+            }
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message || isProcessing) return;
+            
+            isProcessing = true;
+            sendButton.disabled = true;
+            messageInput.disabled = true;
+            
+            addMessage(message, 'user', 'You');
+            messageInput.value = '';
+            
+            const loadingMessage = addMessage('', 'loading', assistantDetails?.name || 'Assistant');
+            
+            try {
+                const response = await fetch(`/api/assistants/${assistantKey}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message,
+                        sessionId
+                    }),
+                });
+                
+                const data = await response.json();
+                
+                loadingMessage.remove();
+                
+                if (response.ok) {
+                    addMessage(data.response, 'assistant', data.assistantName || 'Assistant');
+                    
+                    if (!threadId && data.threadId) {
+                        threadId = data.threadId;
+                        await checkHealth();
+                    }
+                } else {
+                    addMessage(data.error || 'An error occurred', 'error');
+                }
+            } catch (error) {
+                loadingMessage.remove();
+                addMessage('Failed to connect to server', 'error');
+            } finally {
+                isProcessing = false;
+                sendButton.disabled = false;
+                messageInput.disabled = false;
+                messageInput.focus();
+            }
+        }
+
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+        });
+
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        newThreadBtn.addEventListener('click', async () => {
+            if (confirm('Start a new conversation? Current thread will be preserved.')) {
+                await createNewThread();
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            if (confirm('Clear the current conversation display?')) {
+                chatContainer.innerHTML = '';
+                addMessage('Conversation cleared (thread preserved)', 'system');
+            }
+        });
+
+        // Initialize
+        loadAssistantInfo();
+        checkHealth();
+        setInterval(checkHealth, 30000);
+
+        addMessage(`Welcome! You're chatting with the ${assistantKey} assistant. Type a message to begin.`, 'system');
+        messageInput.focus();
+    </script>
+</body>
+</html>
