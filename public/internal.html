@@ -544,6 +544,8 @@ h4{
   to { transform: rotate(360deg); }
 }
 </style>
+<!-- SheetJS library for Excel manipulation -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 </head><body>
 <div class="app">
   <aside class="aside">
@@ -728,6 +730,9 @@ h4{
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeTestModal()">Cancel</button>
+      <button class="btn" id="exportExcelBtn" onclick="exportToExcel()" style="display:none;">
+        📊 Export to Excel
+      </button>
       <button class="btn primary" id="submitTestBtn" onclick="submitTest()">
         <span id="submitBtnText">Submit Test</span>
       </button>
@@ -751,6 +756,7 @@ function notImplemented(e){
 // Modal functionality
 let currentControlId = '';
 let sessionId = '';
+let lastTestResults = null; // Store the last test results for export
 
 function openTestModal(controlId, controlName) {
   currentControlId = controlId;
@@ -766,6 +772,8 @@ function openTestModal(controlId, controlName) {
   document.getElementById('testResults').innerHTML = '';
   document.getElementById('submitBtnText').textContent = 'Submit Test';
   document.getElementById('submitTestBtn').disabled = false;
+  document.getElementById('exportExcelBtn').style.display = 'none';
+  lastTestResults = null;
   
   modal.style.display = 'block';
 }
@@ -818,9 +826,20 @@ async function submitTest() {
     }
     
     if (response.ok) {
+      // Store results for export
+      lastTestResults = {
+        controlId: currentControlId,
+        response: data.response,
+        timestamp: new Date().toISOString(),
+        userIds: testData
+      };
+      
       // Display results
       resultsDiv.innerHTML = formatResults(data.response);
       resultsDiv.style.display = 'block';
+      
+      // Show export button
+      document.getElementById('exportExcelBtn').style.display = 'inline-block';
       
       // Update control status if test passed
       if (data.response.includes('PASSED') || data.response.includes('Effective')) {
@@ -871,6 +890,187 @@ function formatResults(response) {
   }
   
   return formatted;
+}
+
+// Export results to Excel
+async function exportToExcel() {
+  if (!lastTestResults) {
+    toast('No test results to export');
+    return;
+  }
+  
+  try {
+    // Parse the test results
+    const parseResults = parseTestResultsForExcel(lastTestResults.response);
+    
+    // Fetch the template
+    const response = await fetch('/templates/sox_lead_sheet_template.xlsx');
+    const templateBuffer = await response.arrayBuffer();
+    
+    // Read the template workbook
+    const workbook = XLSX.read(templateBuffer, { type: 'array' });
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    
+    // Fill in the template fields
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Control Information
+    worksheet['B4'] = { t: 's', v: 'ACC-01' };
+    worksheet['B5'] = { t: 's', v: 'Terminated User Access Removal' };
+    worksheet['B6'] = { t: 's', v: 'Access Control' };
+    worksheet['B7'] = { t: 's', v: 'IT Security Team' };
+    worksheet['B8'] = { t: 's', v: parseResults.testingPeriodStart || today };
+    worksheet['B9'] = { t: 's', v: parseResults.testingPeriodEnd || today };
+    
+    // Population & Sampling
+    worksheet['B12'] = { t: 's', v: 'HR Termination Report & Active Directory' };
+    worksheet['B13'] = { t: 'n', v: parseResults.sampleSize || 0 };
+    worksheet['B14'] = { t: 'n', v: parseResults.sampleSize || 0 };
+    worksheet['B15'] = { t: 's', v: 'Judgmental - High Risk Users' };
+    worksheet['B16'] = { t: 's', v: 'Yes - Cross-referenced with AD' };
+    worksheet['B17'] = { t: 's', v: parseResults.notes || 'Automated SOX testing performed' };
+    
+    // Results Summary
+    worksheet['B28'] = { t: 'n', v: parseResults.sampleSize || 0 };
+    worksheet['B29'] = { t: 'n', v: parseResults.sampleSize || 0 };
+    worksheet['B30'] = { t: 'n', v: parseResults.exceptions || 0 };
+    worksheet['B31'] = { t: 's', v: parseResults.exceptionRate || '0%' };
+    worksheet['B32'] = { t: 's', v: parseResults.controlConclusion || 'Pending' };
+    
+    // Exception Details - Start from row 36
+    if (parseResults.details && parseResults.details.length > 0) {
+      let currentRow = 36;
+      parseResults.details.forEach((detail, index) => {
+        if (currentRow <= 50) { // Limit to prevent overwriting other sections
+          worksheet['A' + currentRow] = { t: 's', v: detail.userId || '' };
+          worksheet['B' + currentRow] = { t: 's', v: detail.userName || '' };
+          worksheet['C' + currentRow] = { t: 's', v: detail.terminationDate || '' };
+          worksheet['D' + currentRow] = { t: 's', v: detail.disableDate || '' };
+          worksheet['E' + currentRow] = { t: 's', v: detail.hoursToDisable || '' };
+          worksheet['F' + currentRow] = { t: 's', v: detail.status || '' };
+          worksheet['G' + currentRow] = { t: 's', v: detail.exceptionReason || '' };
+          currentRow++;
+        }
+      });
+    }
+    
+    // Sign-off
+    worksheet['B39'] = { t: 's', v: 'SOX Auditor (Automated)' };
+    worksheet['B40'] = { t: 's', v: today };
+    worksheet['B41'] = { t: 's', v: 'Pending Review' };
+    worksheet['B42'] = { t: 's', v: '' };
+    worksheet['B43'] = { t: 's', v: 'Pending' };
+    worksheet['B44'] = { t: 's', v: '' };
+    
+    // Write the workbook
+    const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    
+    // Create a blob and download
+    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `SOX_Lead_Sheet_ACC01_${today.replace(/-/g, '')}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast('Excel file exported successfully');
+  } catch (error) {
+    console.error('Export error:', error);
+    toast('Error exporting to Excel: ' + error.message, 3000);
+  }
+}
+
+// Parse test results for Excel export
+function parseTestResultsForExcel(response) {
+  const result = {
+    sampleSize: 0,
+    exceptions: 0,
+    exceptionRate: '0%',
+    controlConclusion: 'Pending',
+    details: [],
+    notes: '',
+    testingPeriodStart: '',
+    testingPeriodEnd: ''
+  };
+  
+  try {
+    // Extract sample size
+    const sampleMatch = response.match(/Sample Size:\s*(\d+)/i);
+    if (sampleMatch) result.sampleSize = parseInt(sampleMatch[1]);
+    
+    // Extract exceptions/failed
+    const failedMatch = response.match(/Failed:\s*(\d+)/i);
+    if (failedMatch) result.exceptions = parseInt(failedMatch[1]);
+    
+    // Extract exception rate
+    const rateMatch = response.match(/Exception Rate:\s*([\d.]+%)/i);
+    if (rateMatch) result.exceptionRate = rateMatch[1];
+    
+    // Extract control effectiveness
+    const effectiveMatch = response.match(/Control Effectiveness:\s*(\w+)/i);
+    if (effectiveMatch) result.controlConclusion = effectiveMatch[1];
+    
+    // Parse detailed findings
+    const userIdPattern = /User ID:\s*(u\d+)/gi;
+    const namePattern = /User Name:\s*([^\n]+)/gi;
+    const termPattern = /Termination Time:\s*([^\n]+)/gi;
+    const disablePattern = /Account Disabled Time:\s*([^\n]+)/gi;
+    const statusPattern = /Status:\s*(PASSED|FAILED)/gi;
+    
+    // Extract all user details
+    const userIds = [...response.matchAll(userIdPattern)];
+    const names = [...response.matchAll(namePattern)];
+    const termTimes = [...response.matchAll(termPattern)];
+    const disableTimes = [...response.matchAll(disablePattern)];
+    const statuses = [...response.matchAll(statusPattern)];
+    
+    // Combine into detail objects
+    for (let i = 0; i < userIds.length; i++) {
+      const detail = {
+        userId: userIds[i] ? userIds[i][1] : '',
+        userName: names[i] ? names[i][1] : '',
+        terminationDate: termTimes[i] ? termTimes[i][1] : '',
+        disableDate: disableTimes[i] ? disableTimes[i][1] : 'Not disabled',
+        hoursToDisable: '',
+        status: statuses[i] ? statuses[i][1] : '',
+        exceptionReason: ''
+      };
+      
+      // Calculate hours to disable if both dates present
+      if (detail.terminationDate && detail.disableDate && detail.disableDate !== 'Not disabled') {
+        try {
+          const termDate = new Date(detail.terminationDate);
+          const disDate = new Date(detail.disableDate);
+          const diffMinutes = Math.round((disDate - termDate) / (1000 * 60));
+          detail.hoursToDisable = `${Math.round(diffMinutes / 60)}h ${diffMinutes % 60}m`;
+          if (diffMinutes > 10) {
+            detail.exceptionReason = `Exceeded 10-minute requirement (${diffMinutes} minutes)`;
+          }
+        } catch (e) {
+          // Date parsing error
+        }
+      } else if (detail.status === 'FAILED') {
+        detail.exceptionReason = 'Account not disabled';
+      }
+      
+      result.details.push(detail);
+    }
+    
+    // Set testing period (last 30 days for example)
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+    result.testingPeriodStart = startDate.toISOString().split('T')[0];
+    result.testingPeriodEnd = endDate.toISOString().split('T')[0];
+    
+  } catch (error) {
+    console.error('Error parsing results:', error);
+  }
+  
+  return result;
 }
 
 // Close modal when clicking outside of it
