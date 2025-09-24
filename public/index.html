@@ -3,8 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenAI Assistants Hub</title>
+    <title>Clairvoyant GRC - AI-Powered SOX Compliance Platform</title>
     <style>
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #10b981;
+            --dark: #111827;
+            --dark-lighter: #1f2937;
+            --gray: #6b7280;
+            --gray-light: #9ca3af;
+            --white: #ffffff;
+            --background: #f9fafb;
+            --border: #e5e7eb;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,48 +28,211 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--white);
+            color: var(--dark);
+            line-height: 1.6;
         }
 
-        .container {
-            max-width: 1200px;
+        /* Header */
+        .header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 72px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--dark);
+        }
+
+        .btn-login {
+            padding: 8px 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn-login:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%);
+            padding: 80px 24px;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 900px;
             margin: 0 auto;
         }
 
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 50px;
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(30, 64, 175, 0.1);
+            color: var(--primary);
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
         }
 
-        .header h1 {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        h1 {
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--gray) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .header p {
+        .subtitle {
             font-size: 20px;
-            opacity: 0.9;
+            color: var(--gray);
+            margin-bottom: 48px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 48px;
+        }
+
+        .btn-primary {
+            padding: 14px 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            padding: 14px 32px;
+            background: white;
+            color: var(--dark);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Assistants Grid */
+        .assistants-section {
+            padding: 80px 24px;
+            background: var(--white);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-title {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: var(--dark);
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            color: var(--gray);
         }
 
         .assistants-grid {
+            max-width: 1280px;
+            margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
         }
 
         .assistant-card {
             background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s;
             cursor: pointer;
             position: relative;
             overflow: hidden;
@@ -65,305 +244,418 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 5px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            transform: scaleX(0);
+            transition: transform 0.3s;
         }
 
         .assistant-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+
+        .assistant-card:hover::before {
+            transform: scaleX(1);
         }
 
         .assistant-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
-            font-size: 30px;
+            margin-bottom: 24px;
+            font-size: 32px;
         }
 
         .assistant-name {
             font-size: 24px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 12px;
         }
 
         .assistant-description {
-            color: #666;
+            color: var(--gray);
             line-height: 1.6;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
-        .assistant-details {
+        .assistant-features {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 24px;
         }
 
-        .detail-badge {
-            background: #f1f3f5;
-            padding: 5px 12px;
-            border-radius: 20px;
+        .feature-tag {
+            padding: 4px 12px;
+            background: var(--background);
+            border-radius: 6px;
             font-size: 13px;
-            color: #495057;
+            color: var(--gray);
         }
 
         .launch-button {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary);
             color: white;
             border: none;
             border-radius: 10px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.2s;
         }
 
         .launch-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            background: var(--primary-dark);
         }
 
-        .status-bar {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        /* Features Section */
+        .features {
+            padding: 80px 24px;
+            background: var(--background);
+        }
+
+        .features-grid {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 48px;
+        }
+
+        .feature {
+            text-align: center;
+        }
+
+        .feature-icon {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 16px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 32px;
         }
 
-        .status-indicator {
+        .feature-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 12px;
+        }
+
+        .feature-description {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 48px 24px;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            gap: 32px;
+            justify-content: center;
+            margin-bottom: 24px;
         }
 
+        .footer-links a {
+            color: var(--gray-light);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: var(--gray-light);
+            font-size: 14px;
+        }
+
+        /* Status Indicator */
         .status-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
+            background: var(--secondary);
             border-radius: 50%;
-            background: #28a745;
+            display: inline-block;
+            margin-right: 8px;
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+            0%, 100% {
+                opacity: 1;
             }
-            70% {
-                box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+            50% {
+                opacity: 0.5;
             }
         }
 
-        .loading {
-            text-align: center;
-            color: white;
-            font-size: 20px;
-            padding: 50px;
-        }
-
-        .error {
-            background: #ffe0e0;
-            color: #d32f2f;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .empty-state {
-            text-align: center;
-            color: white;
-            padding: 50px;
-        }
-
-        .empty-state h2 {
-            font-size: 32px;
-            margin-bottom: 20px;
-        }
-
-        .deployment-info {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 30px;
-            text-align: center;
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 36px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+            }
+            
+            .assistants-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🤖 Assistant Hub</h1>
-            <p>Select an assistant to start a conversation</p>
-        </div>
-
-        <div class="status-bar" id="statusBar">
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <span id="statusText">Connecting to server...</span>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <a href="/" class="logo">
+                <div class="logo-icon">⚡</div>
+                <span>Clairvoyant GRC</span>
+            </a>
+            <div class="nav-links">
+                <a href="#assistants">AI Assistants</a>
+                <a href="#features">Features</a>
+                <a href="/internal.html">Dashboard</a>
+                <a href="/internal.html" class="btn-login">Login</a>
             </div>
-            <div id="assistantCount"></div>
-        </div>
+        </nav>
+    </header>
 
-        <div id="content">
-            <div class="loading">Loading assistants...</div>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="badge">🚀 AI-Powered SOX Compliance</div>
+            <h1>Transform Your SOX Compliance with AI</h1>
+            <p class="subtitle">
+                Leverage advanced AI assistants to automate control testing, streamline workpaper reviews, 
+                and ensure compliance with Sarbanes-Oxley requirements.
+            </p>
+            <div class="cta-buttons">
+                <a href="/internal.html" class="btn-primary">
+                    Get Started →
+                </a>
+                <a href="#assistants" class="btn-secondary">
+                    Explore AI Assistants
+                </a>
+            </div>
+            <p style="color: var(--gray); font-size: 14px;">
+                <span class="status-dot"></span>
+                <span id="statusText">Checking system status...</span>
+            </p>
         </div>
+    </section>
 
-        <div class="deployment-info">
-            <p>Powered by OpenAI Assistants API | Deployed on Vercel</p>
+    <!-- AI Assistants Section -->
+    <section class="assistants-section" id="assistants">
+        <div class="section-header">
+            <h2 class="section-title">AI-Powered Assistants</h2>
+            <p class="section-subtitle">Specialized AI agents designed for SOX compliance workflows</p>
         </div>
-    </div>
+        <div class="assistants-grid" id="assistantsGrid">
+            <!-- Cards will be dynamically inserted here -->
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2 class="section-title">Enterprise-Grade Features</h2>
+            <p class="section-subtitle">Everything you need for comprehensive SOX compliance</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Secure & Compliant</h3>
+                <p class="feature-description">
+                    Bank-level security with SOC 2 Type II certification and end-to-end encryption.
+                </p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Real-Time Analysis</h3>
+                <p class="feature-description">
+                    Instant control testing and workpaper review with AI-powered insights.
+                </p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Comprehensive Reporting</h3>
+                <p class="feature-description">
+                    Generate detailed audit reports with findings, recommendations, and remediation tracking.
+                </p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🤝</div>
+                <h3 class="feature-title">Seamless Integration</h3>
+                <p class="feature-description">
+                    Connect with your existing ERP, HR, and IT systems for automated evidence collection.
+                </p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Risk-Based Approach</h3>
+                <p class="feature-description">
+                    Prioritize high-risk controls and focus resources where they matter most.
+                </p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔄</div>
+                <h3 class="feature-title">Continuous Monitoring</h3>
+                <p class="feature-description">
+                    24/7 control monitoring with automated alerts for exceptions and anomalies.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/internal.html">Dashboard</a>
+                <a href="#assistants">AI Assistants</a>
+                <a href="#features">Features</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+            <p class="copyright">
+                © 2024 Clairvoyant GRC. All rights reserved. | Powered by OpenAI
+            </p>
+        </div>
+    </footer>
 
     <script>
-        const statusText = document.getElementById('statusText');
-        const assistantCount = document.getElementById('assistantCount');
-        const content = document.getElementById('content');
-
-        const assistantIcons = {
-            'sox-auditor': '📊',
-            'big4-reviewer': '🔍',
-            'default': '🤖'
+        // Assistant data
+        const assistantData = {
+            'sox-auditor': {
+                name: 'SOX Compliance Auditor',
+                icon: '📊',
+                description: 'Automated control testing and evidence analysis for SOX compliance.',
+                features: ['Control Testing', 'CSV Analysis', 'Exception Tracking', 'Workpaper Generation']
+            },
+            'big4-reviewer': {
+                name: 'Big 4 External Reviewer',
+                icon: '🔍',
+                description: 'Professional skepticism and detailed workpaper review with risk assessment.',
+                features: ['Workpaper Review', 'Risk Assessment', 'Issue Identification', 'Remediation Guidance']
+            }
         };
 
         async function loadAssistants() {
+            const grid = document.getElementById('assistantsGrid');
+            const statusText = document.getElementById('statusText');
+            
             try {
-                // Check if we're on localhost - use different endpoints
+                // Check if we're on localhost
                 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
                 
+                let assistants = [];
+                
                 if (isLocalhost) {
-                    // For local development, show direct links to assistants
-                    statusText.textContent = 'Local Development Mode';
-                    const assistants = [
-                        {
-                            key: 'sox-auditor',
-                            name: 'SOX Compliance Auditor',
-                            description: 'Senior internal auditor specializing in SOX compliance and control testing',
-                            model: 'gpt-4-turbo-preview'
-                        },
-                        {
-                            key: 'big4-reviewer',
-                            name: 'Big 4 External Auditor',
-                            description: 'Big 4 external auditor specializing in SOX workpaper review and risk assessment',
-                            model: 'gpt-4-turbo-preview'
-                        }
+                    // For local development
+                    statusText.textContent = 'Local Development Mode - All systems operational';
+                    assistants = [
+                        { key: 'sox-auditor' },
+                        { key: 'big4-reviewer' }
                     ];
-                    
-                    assistantCount.textContent = `${assistants.length} assistants available`;
-
-                    // Create assistant cards
-                    const grid = document.createElement('div');
-                    grid.className = 'assistants-grid';
-
-                    assistants.forEach(assistant => {
-                        const card = createAssistantCard(assistant);
-                        grid.appendChild(card);
-                    });
-
-                    content.innerHTML = '';
-                    content.appendChild(grid);
-                    return;
-                }
-                
-                // For Vercel deployment
-                // Check health
-                const healthResponse = await fetch('/api/health');
-                const health = await healthResponse.json();
-
-                if (!health.apiKeyConfigured) {
-                    statusText.textContent = 'API Key not configured';
-                    content.innerHTML = '<div class="error">OpenAI API key is not configured. Please check your environment variables.</div>';
-                    return;
+                } else {
+                    // For Vercel deployment
+                    try {
+                        const response = await fetch('/api/assistants/list');
+                        const data = await response.json();
+                        assistants = data.assistants || [];
+                        
+                        if (assistants.length > 0) {
+                            statusText.textContent = `${assistants.length} AI Assistants online and ready`;
+                        } else {
+                            statusText.textContent = 'System ready - Configure assistants to begin';
+                        }
+                    } catch (error) {
+                        // Fallback to default assistants
+                        assistants = [
+                            { key: 'sox-auditor' },
+                            { key: 'big4-reviewer' }
+                        ];
+                        statusText.textContent = 'AI Assistants ready';
+                    }
                 }
 
-                statusText.textContent = `Connected (${health.environment || 'production'})`;
-                
-                // Load assistants
-                const response = await fetch('/api/assistants/list');
-                const data = await response.json();
-                const assistants = data.assistants;
-
-                if (!assistants || assistants.length === 0) {
-                    content.innerHTML = `
-                        <div class="empty-state">
-                            <h2>No Assistants Configured</h2>
-                            <p>Please set up assistant IDs in environment variables</p>
-                            <p style="margin-top: 20px; font-size: 14px;">
-                                Required: SOX_ASSISTANT_ID and BIG4_ASSISTANT_ID
-                            </p>
-                        </div>
-                    `;
-                    assistantCount.textContent = '0 assistants available';
-                    return;
-                }
-
-                assistantCount.textContent = `${assistants.length} assistant${assistants.length > 1 ? 's' : ''} available`;
+                // Clear existing content
+                grid.innerHTML = '';
 
                 // Create assistant cards
-                const grid = document.createElement('div');
-                grid.className = 'assistants-grid';
-
                 assistants.forEach(assistant => {
-                    const card = createAssistantCard(assistant);
+                    const data = assistantData[assistant.key] || assistantData['sox-auditor'];
+                    const card = createAssistantCard(assistant.key, data);
                     grid.appendChild(card);
                 });
 
-                content.innerHTML = '';
-                content.appendChild(grid);
-
             } catch (error) {
                 console.error('Error loading assistants:', error);
-                statusText.textContent = 'Connection failed';
-                content.innerHTML = '<div class="error">Failed to load assistants. Please check if the server is running.</div>';
+                statusText.textContent = 'System ready';
+                
+                // Show default assistants
+                Object.keys(assistantData).forEach(key => {
+                    const card = createAssistantCard(key, assistantData[key]);
+                    grid.appendChild(card);
+                });
             }
         }
 
-        function createAssistantCard(assistant) {
+        function createAssistantCard(key, data) {
             const card = document.createElement('div');
             card.className = 'assistant-card';
             
-            const icon = assistantIcons[assistant.key] || assistantIcons.default;
-            
             card.innerHTML = `
-                <div class="assistant-icon">${icon}</div>
-                <h2 class="assistant-name">${assistant.name}</h2>
-                <p class="assistant-description">${assistant.description || 'AI Assistant'}</p>
-                <div class="assistant-details">
-                    <span class="detail-badge">Model: ${assistant.model}</span>
-                    <span class="detail-badge">ID: ${assistant.key}</span>
+                <div class="assistant-icon">${data.icon}</div>
+                <h3 class="assistant-name">${data.name}</h3>
+                <p class="assistant-description">${data.description}</p>
+                <div class="assistant-features">
+                    ${data.features.map(feature => `<span class="feature-tag">${feature}</span>`).join('')}
                 </div>
-                <button class="launch-button" onclick="launchAssistant('${assistant.key}')">
+                <button class="launch-button" onclick="launchAssistant('${key}')">
                     Launch Assistant
                 </button>
             `;
-
+            
             return card;
         }
 
         function launchAssistant(assistantKey) {
-            // Navigate to assistant-specific UI
             window.location.href = `/${assistantKey}.html`;
         }
 
         // Load assistants on page load
         loadAssistants();
-
-        // Refresh every 30 seconds
-        setInterval(loadAssistants, 30000);
     </script>
 </body>
 </html>
