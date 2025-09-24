@@ -10,6 +10,10 @@
       "destination": "/public/index.html"
     },
     {
+      "source": "/internal.html",
+      "destination": "/public/internal.html"
+    },
+    {
       "source": "/sox-auditor.html",
       "destination": "/public/sox-auditor.html"
     },

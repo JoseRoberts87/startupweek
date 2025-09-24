@@ -19,7 +19,9 @@
       "Bash(cp:*)",
       "Bash(npm run setup:big4:*)",
       "Bash(npm install:*)",
-      "Bash(vercel dev:*)"
+      "Bash(vercel dev:*)",
+      "Bash(npx vercel dev:*)",
+      "Bash(PORT=3006 npm start)"
     ],
     "deny": [],
     "ask": []

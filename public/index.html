@@ -242,6 +242,44 @@
 
         async function loadAssistants() {
             try {
+                // Check if we're on localhost - use different endpoints
+                const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                
+                if (isLocalhost) {
+                    // For local development, show direct links to assistants
+                    statusText.textContent = 'Local Development Mode';
+                    const assistants = [
+                        {
+                            key: 'sox-auditor',
+                            name: 'SOX Compliance Auditor',
+                            description: 'Senior internal auditor specializing in SOX compliance and control testing',
+                            model: 'gpt-4-turbo-preview'
+                        },
+                        {
+                            key: 'big4-reviewer',
+                            name: 'Big 4 External Auditor',
+                            description: 'Big 4 external auditor specializing in SOX workpaper review and risk assessment',
+                            model: 'gpt-4-turbo-preview'
+                        }
+                    ];
+                    
+                    assistantCount.textContent = `${assistants.length} assistants available`;
+
+                    // Create assistant cards
+                    const grid = document.createElement('div');
+                    grid.className = 'assistants-grid';
+
+                    assistants.forEach(assistant => {
+                        const card = createAssistantCard(assistant);
+                        grid.appendChild(card);
+                    });
+
+                    content.innerHTML = '';
+                    content.appendChild(grid);
+                    return;
+                }
+                
+                // For Vercel deployment
                 // Check health
                 const healthResponse = await fetch('/api/health');
                 const health = await healthResponse.json();
@@ -252,7 +290,7 @@
                     return;
                 }
 
-                statusText.textContent = `Connected (${health.environment || 'local'})`;
+                statusText.textContent = `Connected (${health.environment || 'production'})`;
                 
                 // Load assistants
                 const response = await fetch('/api/assistants/list');
