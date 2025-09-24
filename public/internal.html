@@ -410,6 +410,139 @@ h4{
     grid-column:span 1;
   }
 }
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background-color: var(--white);
+  margin: 50px auto;
+  padding: 0;
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  padding: 20px 24px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border-radius: var(--radius) var(--radius) 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.modal-close {
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  background: none;
+  border: none;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  opacity: 1;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-body textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 12px;
+  border: var(--border-style);
+  border-radius: 8px;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  resize: vertical;
+  background: var(--panel-2);
+}
+
+.modal-body textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  background: var(--panel-2);
+  border-top: var(--border-style);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.modal-results {
+  background: var(--panel-2);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--gray-light);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 </style>
 </head><body>
 <div class="app">
@@ -526,11 +659,11 @@ h4{
                 <span class="badge">terminated_users.csv</span>
                 <span class="badge">user_directory.csv</span>
               </td>
-              <td><span class="pill warn">Pending</span></td>
+              <td><span class="pill warn" id="status-ACC-01">Pending</span></td>
               <td>
-                <a class="btn primary" href="/sox-auditor.html" style="padding:6px 12px;font-size:13px">
+                <button class="btn primary" onclick="openTestModal('ACC-01', 'Terminated User Access Removal')" style="padding:6px 12px;font-size:13px;border:none;cursor:pointer">
                   Test Control
-                </a>
+                </button>
               </td>
             </tr>
             <tr>
@@ -575,6 +708,33 @@ h4{
     </section>
   </main>
 </div>
+
+<!-- Control Testing Modal -->
+<div id="testModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle">Test Control</h2>
+      <button class="modal-close" onclick="closeTestModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:12px;color:var(--gray)">
+        For ACC-01, enter the user IDs you want to audit (e.g., u1001, u1002, u1003)
+      </p>
+      <textarea 
+        id="testData" 
+        placeholder="Enter user IDs to audit: u1001, u1002, u1003, u1004, u1005"
+      ></textarea>
+      <div id="testResults" class="modal-results" style="display:none;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeTestModal()">Cancel</button>
+      <button class="btn primary" id="submitTestBtn" onclick="submitTest()">
+        <span id="submitBtnText">Submit Test</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 <script>
 function toast(msg, ms=2000){
@@ -586,6 +746,126 @@ function toast(msg, ms=2000){
 function notImplemented(e){
   e.preventDefault();
   toast('This feature is coming soon!')
+}
+
+// Modal functionality
+let currentControlId = '';
+let sessionId = '';
+
+function openTestModal(controlId, controlName) {
+  currentControlId = controlId;
+  sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  
+  const modal = document.getElementById('testModal');
+  const modalTitle = document.getElementById('modalTitle');
+  modalTitle.textContent = `Test Control: ${controlId} - ${controlName}`;
+  
+  // Reset modal state
+  document.getElementById('testData').value = '';
+  document.getElementById('testResults').style.display = 'none';
+  document.getElementById('testResults').innerHTML = '';
+  document.getElementById('submitBtnText').textContent = 'Submit Test';
+  document.getElementById('submitTestBtn').disabled = false;
+  
+  modal.style.display = 'block';
+}
+
+function closeTestModal() {
+  document.getElementById('testModal').style.display = 'none';
+}
+
+async function submitTest() {
+  const testData = document.getElementById('testData').value.trim();
+  if (!testData) {
+    toast('Please enter user IDs to test');
+    return;
+  }
+  
+  const submitBtn = document.getElementById('submitTestBtn');
+  const submitBtnText = document.getElementById('submitBtnText');
+  const resultsDiv = document.getElementById('testResults');
+  
+  // Disable button and show loading
+  submitBtn.disabled = true;
+  submitBtnText.innerHTML = '<span class="loading-spinner"></span>Testing...';
+  
+  try {
+    // Call the SOX auditor API
+    const response = await fetch('/api/assistants/sox-chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: `Please audit the following terminated users: ${testData}`,
+        sessionId: sessionId
+      }),
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      // Display results
+      resultsDiv.innerHTML = formatResults(data.response);
+      resultsDiv.style.display = 'block';
+      
+      // Update control status if test passed
+      if (data.response.includes('PASSED') || data.response.includes('Effective')) {
+        const statusPill = document.getElementById(`status-${currentControlId}`);
+        if (statusPill) {
+          statusPill.className = 'pill ok';
+          statusPill.textContent = 'Tested';
+        }
+      }
+      
+      submitBtnText.textContent = 'Test Complete';
+      toast('Control test completed successfully');
+    } else {
+      throw new Error(data.error || 'Test failed');
+    }
+  } catch (error) {
+    console.error('Error testing control:', error);
+    resultsDiv.innerHTML = `<div style="color:var(--bad)">Error: ${error.message}</div>`;
+    resultsDiv.style.display = 'block';
+    submitBtnText.textContent = 'Test Failed';
+    toast('Error: ' + error.message, 3000);
+  } finally {
+    // Re-enable button after a delay
+    setTimeout(() => {
+      submitBtn.disabled = false;
+      submitBtnText.textContent = 'Run Another Test';
+    }, 2000);
+  }
+}
+
+function formatResults(response) {
+  // Format the response for better display
+  let formatted = response
+    .replace(/### /g, '<h4 style="margin:16px 0 8px;color:var(--primary)">')
+    .replace(/\n\n/g, '</p><p style="margin:8px 0">')
+    .replace(/\n- /g, '</li><li>')
+    .replace(/- /g, '<ul style="margin:8px 0;padding-left:20px"><li>')
+    .replace(/<li>(.*?)\n/g, '<li>$1</li></ul>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/PASSED/g, '<span style="color:var(--ok);font-weight:600">PASSED</span>')
+    .replace(/FAILED/g, '<span style="color:var(--bad);font-weight:600">FAILED</span>')
+    .replace(/Effective/g, '<span style="color:var(--ok);font-weight:600">Effective</span>')
+    .replace(/Ineffective/g, '<span style="color:var(--bad);font-weight:600">Ineffective</span>');
+  
+  // Wrap in paragraph tags if not already formatted
+  if (!formatted.includes('<')) {
+    formatted = '<p>' + formatted + '</p>';
+  }
+  
+  return formatted;
+}
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+  const modal = document.getElementById('testModal');
+  if (event.target === modal) {
+    closeTestModal();
+  }
 }
 </script>
 </body></html>
