@@ -1,165 +1,589 @@
 <!doctype html><html><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Clairvoyant SOX — Internal Auditor</title>
+<title>Clairvoyant GRC — Internal Dashboard</title>
 <style>
-:root{
-  --bg:#0b1220; --panel:#0e1a2f; --panel-2:#13233f; --text:#e6edf3; --muted:#94a3b8; --accent:#60a5fa;
-  --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444; --purple:#a78bfa; --amber:#fbbf24; --green:#34d399; --blue:#60a5fa;
-  --radius:14px; --border:1px solid #1e2a44; --shadow:0 10px 24px rgba(0,0,0,0.35);
+:root {
+  /* Updated color scheme to match main page */
+  --primary: #1e40af;
+  --primary-dark: #1e3a8a;
+  --primary-light: #3b82f6;
+  --secondary: #10b981;
+  --dark: #111827;
+  --dark-lighter: #1f2937;
+  --gray: #6b7280;
+  --gray-light: #9ca3af;
+  --white: #ffffff;
+  --background: #f9fafb;
+  --border: #e5e7eb;
+  
+  /* Dashboard specific colors */
+  --panel: #ffffff;
+  --panel-2: #f9fafb;
+  --text: #111827;
+  --muted: #6b7280;
+  --accent: #3b82f6;
+  
+  /* Status colors */
+  --ok: #10b981;
+  --warn: #f59e0b;
+  --bad: #ef4444;
+  --purple: #8b5cf6;
+  --amber: #f59e0b;
+  --green: #10b981;
+  --blue: #3b82f6;
+  
+  /* UI properties */
+  --radius: 10px;
+  --border-style: 1px solid #e5e7eb;
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
+
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(120deg,#0b1220,#0a1326);color:var(--text)}
-a{color:inherit}
+body{
+  margin:0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--background);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+a{color:inherit;text-decoration:none}
+
 .app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
-.aside{background:var(--panel);border-right:var(--border);padding:20px;position:sticky;top:0;height:100vh}
-.brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
-.logo{width:34px;height:34px;border-radius:10px;background:var(--accent);box-shadow:var(--shadow)}
-.brand h1{font-size:16px;margin:0}
-.nav .section{color:var(--muted);font-size:12px;margin:16px 10px 6px}
-.nav a{display:flex;align-items:center;gap:10px;color:var(--text);text-decoration:none;padding:10px 12px;border-radius:10px;margin:4px 0}
-.nav a:hover{background:var(--panel-2)}
-.main{padding:22px 26px}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-.search{background:var(--panel);border:var(--border);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;min-width:320px}
-.search input{background:transparent;border:none;outline:none;color:var(--text);width:100%}
-.user{display:flex;align-items:center;gap:10px}
-.avatar{width:34px;height:34px;border-radius:50%;background:#1f2a44}
-h2.title{margin:6px 0 14px;font-size:20px}
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
-.card{background:var(--panel);border:var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
-.col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-8{grid-column:span 8}.col-12{grid-column:span 12}
-.kpis{display:flex;gap:12px;flex-wrap:wrap}
-.kpi{flex:1;min-width:180px;background:var(--panel-2);border:var(--border);border-radius:12px;padding:12px}
-.kpi .label{color:var(--muted);font-size:12px}
-.kpi .value{font-size:22px;margin-top:6px}
-.badge{padding:2px 8px;border-radius:999px;font-size:11px;border:var(--border);background:#0b1730;color:var(--muted)}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:var(--border);background:var(--panel-2);color:var(--text);text-decoration:none;cursor:pointer}
-.btn.primary{background:var(--accent);color:#071426;border:none}
-.btn.success{background:var(--ok);color:#052e1b;border:none}
-.btn.warn{background:var(--warn);color:#201402;border:none}
-.btn.ghost{background:transparent}
-.table{width:100%;border-collapse:collapse;font-size:14px}
-.table th,.table td{border-bottom:1px solid #1e2a44;padding:10px 8px;text-align:left;color:var(--text)}
-.table th{color:var(--muted);font-weight:600}
-.pill{border-radius:999px;padding:4px 8px;font-size:12px}
-.pill.ok{background:rgba(34,197,94,.15);color:#34d399}
-.pill.warn{background:rgba(245,158,11,.15);color:#fbbf24}
-.pill.bad{background:rgba(239,68,68,.15);color:#f87171}
-.footer{color:var(--muted);font-size:12px;margin-top:14px}
-.toast{position:fixed;bottom:20px;right:20px;background:#111827;border:1px solid #374151;color:#e5e7eb;padding:12px 14px;border-radius:10px;display:none}
+
+/* Sidebar */
+.aside{
+  background:var(--white);
+  border-right:var(--border-style);
+  padding:24px 20px;
+  position:sticky;
+  top:0;
+  height:100vh;
+  box-shadow: var(--shadow);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:32px;
+}
+
+.logo{
+  width:40px;
+  height:40px;
+  border-radius:10px;
+  background:linear-gradient(135deg, var(--primary), var(--primary-light));
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:20px;
+}
+
+.brand h1{
+  font-size:20px;
+  font-weight:700;
+  margin:0;
+  color:var(--dark);
+}
+
+.nav .section{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin:24px 12px 8px;
+}
+
+.nav a{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:var(--gray);
+  text-decoration:none;
+  padding:10px 12px;
+  border-radius:8px;
+  margin:2px 0;
+  font-weight:500;
+  transition:all 0.2s;
+}
+
+.nav a:hover{
+  background:var(--panel-2);
+  color:var(--dark);
+}
+
+.nav a.active{
+  background:rgba(30, 64, 175, 0.1);
+  color:var(--primary);
+}
+
+/* Main content */
+.main{
+  padding:24px 32px;
+  background:var(--background);
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:24px;
+  background:var(--white);
+  padding:16px 24px;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+
+.search{
+  background:var(--panel-2);
+  border:var(--border-style);
+  border-radius:8px;
+  padding:10px 16px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:320px;
+}
+
+.search input{
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--text);
+  width:100%;
+  font-size:14px;
+}
+
+.search input::placeholder{
+  color:var(--gray-light);
+}
+
+.user{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:500;
+}
+
+.avatar{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:linear-gradient(135deg, var(--primary), var(--primary-light));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:16px;
+}
+
+h2.title{
+  margin:0 0 24px;
+  font-size:28px;
+  font-weight:800;
+  color:var(--dark);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:20px;
+}
+
+.card{
+  background:var(--white);
+  border:var(--border-style);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+
+.col-3{grid-column:span 3}
+.col-4{grid-column:span 4}
+.col-6{grid-column:span 6}
+.col-8{grid-column:span 8}
+.col-12{grid-column:span 12}
+
+/* KPIs */
+.kpis{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+}
+
+.kpi{
+  flex:1;
+  min-width:180px;
+  background:var(--panel-2);
+  border:var(--border-style);
+  border-radius:var(--radius);
+  padding:16px;
+}
+
+.kpi .label{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+
+.kpi .value{
+  font-size:28px;
+  font-weight:700;
+  margin-top:8px;
+  color:var(--dark);
+}
+
+.badge{
+  display:inline-block;
+  padding:2px 10px;
+  border-radius:999px;
+  font-size:11px;
+  background:rgba(30, 64, 175, 0.1);
+  color:var(--primary);
+  font-weight:600;
+}
+
+/* Buttons */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 16px;
+  border-radius:8px;
+  border:var(--border-style);
+  background:var(--white);
+  color:var(--text);
+  text-decoration:none;
+  cursor:pointer;
+  font-weight:500;
+  font-size:14px;
+  transition:all 0.2s;
+}
+
+.btn:hover{
+  background:var(--panel-2);
+  box-shadow:var(--shadow);
+}
+
+.btn.primary{
+  background:var(--primary);
+  color:white;
+  border:none;
+}
+
+.btn.primary:hover{
+  background:var(--primary-dark);
+}
+
+.btn.success{
+  background:var(--ok);
+  color:white;
+  border:none;
+}
+
+.btn.warn{
+  background:var(--warn);
+  color:white;
+  border:none;
+}
+
+.btn.ghost{
+  background:transparent;
+  border:none;
+}
+
+/* Table */
+.table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+}
+
+.table th,.table td{
+  border-bottom:var(--border-style);
+  padding:12px;
+  text-align:left;
+  color:var(--text);
+}
+
+.table th{
+  color:var(--muted);
+  font-weight:600;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  background:var(--panel-2);
+}
+
+.table tr:hover{
+  background:var(--panel-2);
+}
+
+/* Pills/Status */
+.pill{
+  border-radius:999px;
+  padding:4px 12px;
+  font-size:12px;
+  font-weight:600;
+  display:inline-block;
+}
+
+.pill.ok{
+  background:rgba(16, 185, 129, 0.1);
+  color:var(--ok);
+}
+
+.pill.warn{
+  background:rgba(245, 158, 11, 0.1);
+  color:var(--warn);
+}
+
+.pill.bad{
+  background:rgba(239, 68, 68, 0.1);
+  color:var(--bad);
+}
+
+.footer{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:12px;
+  line-height:1.5;
+}
+
+/* Toast notification */
+.toast{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:var(--dark);
+  color:white;
+  padding:12px 20px;
+  border-radius:8px;
+  display:none;
+  box-shadow:var(--shadow-lg);
+  animation:slideIn 0.3s ease;
+}
+
+@keyframes slideIn{
+  from{transform:translateY(100px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
+
+/* Card headers */
+h3{
+  margin:0 0 16px 0;
+  font-size:18px;
+  font-weight:700;
+  color:var(--dark);
+}
+
+h4{
+  margin:0 0 8px 0;
+  font-size:16px;
+  font-weight:600;
+  color:var(--dark);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .app{
+    grid-template-columns:1fr;
+  }
+  .aside{
+    position:relative;
+    height:auto;
+  }
+  .grid{
+    grid-template-columns:1fr;
+  }
+  .col-3,.col-4,.col-6,.col-8,.col-12{
+    grid-column:span 1;
+  }
+}
 </style>
 </head><body>
 <div class="app">
   <aside class="aside">
-    <div class="brand"><div class="logo"></div><h1>Clairvoyant SOX</h1></div>
+    <div class="brand">
+      <div class="logo">⚡</div>
+      <h1>Clairvoyant GRC</h1>
+    </div>
     <nav class="nav">
-      <div class="section">INTERNAL AUDIT</div>
-      <a href="#" onclick="notImplemented(event)">Dashboard</a>
-      <a href="#evidence">Evidence</a>
-      <a href="#tests">Tests</a>
-      <a href="#reports">Reports</a>
-      <div class="section">AI ASSISTANTS</div>
-      <a href="/sox-auditor.html">SOX Auditor</a>
-      <a href="/big4-reviewer.html">Big 4 Reviewer</a>
-      <div class="section">ACCOUNT</div>
-      <a href="/">↩ Logout</a>
+      <div class="section">Internal Audit</div>
+      <a href="#" onclick="notImplemented(event)" class="active">📊 Dashboard</a>
+      <a href="#evidence">📁 Evidence</a>
+      <a href="#tests">🧪 Tests</a>
+      <a href="#reports">📄 Reports</a>
+      <div class="section">AI Assistants</div>
+      <a href="/sox-auditor.html">🤖 SOX Auditor</a>
+      <a href="/big4-reviewer.html">🔍 Big 4 Reviewer</a>
+      <div class="section">Account</div>
+      <a href="/">⬅ Back to Home</a>
     </nav>
   </aside>
 
   <main class="main">
     <div class="topbar">
-      <div class="search">🔎 <input placeholder="Search (demo only)"/></div>
-      <div class="user"><div class="avatar"></div> <span>Internal Auditor</span></div>
+      <div class="search">
+        <span style="color:var(--gray-light)">🔎</span>
+        <input placeholder="Search controls, tests, or reports..."/>
+      </div>
+      <div class="user">
+        <div class="avatar">IA</div>
+        <span>Internal Auditor</span>
+      </div>
     </div>
 
-    <h2 class="title">Dashboard</h2>
+    <h2 class="title">SOX Compliance Dashboard</h2>
 
     <section class="grid">
       <div class="card col-8">
         <div class="kpis">
           <div class="kpi">
-            <div class="label">Controls this quarter</div>
+            <div class="label">Controls Tested</div>
             <div class="value">12</div>
-            <div class="badge">Sample data</div>
+            <div class="badge" style="margin-top:8px">Q4 2024</div>
           </div>
           <div class="kpi">
-            <div class="label">% Effective</div>
-            <div class="value">83%</div>
-            <div class="badge">As of Sep</div>
+            <div class="label">Effectiveness Rate</div>
+            <div class="value" style="color:var(--ok)">83%</div>
+            <div class="badge" style="margin-top:8px">↑ 5% from Q3</div>
           </div>
           <div class="kpi">
-            <div class="label">Open exceptions</div>
+            <div class="label">Open Exceptions</div>
             <div class="value"><span class="pill warn">4</span></div>
+            <div class="badge" style="margin-top:8px">2 Critical</div>
           </div>
         </div>
-        <div style="margin-top:12px;color:var(--muted);font-size:13px">
-          This is a static mockup. Use the Evidence and Tests sections below to follow the demo flow.
+        <div class="footer" style="margin-top:20px">
+          Real-time SOX compliance metrics. Use the AI assistants below to automate testing and reviews.
         </div>
       </div>
       <div class="card col-4">
-        <h3 style="margin:0 0 10px 0;">Quick Actions</h3>
-        <a class="btn primary" href="#evidence" onclick="toast('Navigate to Evidence')">Upload Evidence</a>
-        <div style="height:8px"></div>
-        <a class="btn" href="/sox-auditor.html">Run SOX Agent</a>
+        <h3>Quick Actions</h3>
+        <a class="btn primary" href="#evidence" style="width:100%">📤 Upload Evidence</a>
+        <div style="height:12px"></div>
+        <a class="btn" href="/sox-auditor.html" style="width:100%">🤖 Run SOX Agent</a>
+        <div style="height:12px"></div>
+        <a class="btn" href="/big4-reviewer.html" style="width:100%">🔍 Start Review</a>
       </div>
 
       <div id="evidence" class="card col-12">
-        <h3 style="margin:0 0 8px 0;">Evidence</h3>
-        <p class="footer">Upload CSV exports from your systems (demo-only buttons below).</p>
-        <div class="grid">
-          <div class="card col-4">
-            <h4 style="margin:0 0 6px 0;">HR · Terminations</h4>
-            <p class="footer">terminated_users.csv</p>
-            <a class="btn" href="./mock_data/terminated_users.csv" download>⬇ Export from HR (CSV)</a>
+        <h3>Evidence Collection</h3>
+        <p class="footer">Upload CSV exports from your systems for automated control testing.</p>
+        <div class="grid" style="margin-top:20px">
+          <div class="card col-4" style="background:var(--panel-2)">
+            <h4>HR System</h4>
+            <p class="footer">Employee terminations and access changes</p>
+            <a class="btn" href="./mock_data/terminated_users.csv" download style="margin-top:12px">
+              ⬇ Download Sample CSV
+            </a>
           </div>
-          <div class="card col-4">
-            <h4 style="margin:0 0 6px 0;">IT Directory</h4>
-            <p class="footer">user_directory.csv</p>
-            <a class="btn" href="./mock_data/user_directory.csv" download>⬇ Export from Directory (CSV)</a>
+          <div class="card col-4" style="background:var(--panel-2)">
+            <h4>IT Directory</h4>
+            <p class="footer">Active user accounts and permissions</p>
+            <a class="btn" href="./mock_data/user_directory.csv" download style="margin-top:12px">
+              ⬇ Download Sample CSV
+            </a>
           </div>
-          <div class="card col-4">
-            <h4 style="margin:0 0 6px 0;">Finance · GL</h4>
-            <p class="footer">journal_entries.csv</p>
-            <a class="btn" href="./mock_data/journal_entries.csv" download>⬇ Export from GL (CSV)</a>
+          <div class="card col-4" style="background:var(--panel-2)">
+            <h4>Finance System</h4>
+            <p class="footer">Journal entries and approvals</p>
+            <a class="btn" href="./mock_data/journal_entries.csv" download style="margin-top:12px">
+              ⬇ Download Sample CSV
+            </a>
           </div>
         </div>
       </div>
 
       <div id="tests" class="card col-12">
-        <h3 style="margin:0 0 10px 0;">Tests</h3>
+        <h3>Control Testing</h3>
         <table class="table">
-          <thead><tr><th>Control</th><th>Description</th><th>Required Evidence</th><th>Status</th><th>Action</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Control ID</th>
+              <th>Control Description</th>
+              <th>Evidence Required</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
           <tbody>
             <tr>
-              <td>Access · Terminated Users Disabled</td>
-              <td style="color:var(--muted)">Accounts disabled within 24 hours of termination</td>
-              <td><span class="badge">terminated_users.csv</span> <span class="badge">user_directory.csv</span></td>
-              <td><span class="pill warn">Not Started</span></td>
-              <td><a class="btn primary" href="/sox-auditor.html">Run SOX Agent</a></td>
+              <td><strong>ACC-01</strong></td>
+              <td>Terminated User Access Removal</td>
+              <td>
+                <span class="badge">terminated_users.csv</span>
+                <span class="badge">user_directory.csv</span>
+              </td>
+              <td><span class="pill warn">Pending</span></td>
+              <td>
+                <a class="btn primary" href="/sox-auditor.html" style="padding:6px 12px;font-size:13px">
+                  Test Control
+                </a>
+              </td>
             </tr>
             <tr>
-              <td>Financial · JE Approvals &gt; $10k</td>
-              <td style="color:var(--muted)">Maker-checker on high-value journal entries</td>
-              <td><span class="badge">journal_entries.csv</span></td>
-              <td><span class="pill warn">Not Started</span></td>
-              <td><a class="btn primary" href="/sox-auditor.html">Run SOX Agent</a></td>
+              <td><strong>FIN-02</strong></td>
+              <td>Journal Entry Approval >$10,000</td>
+              <td>
+                <span class="badge">journal_entries.csv</span>
+              </td>
+              <td><span class="pill warn">Pending</span></td>
+              <td>
+                <a class="btn primary" href="/sox-auditor.html" style="padding:6px 12px;font-size:13px">
+                  Test Control
+                </a>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>IT-03</strong></td>
+              <td>Privileged Access Review</td>
+              <td>
+                <span class="badge">user_directory.csv</span>
+              </td>
+              <td><span class="pill ok">Effective</span></td>
+              <td>
+                <a class="btn" href="/big4-reviewer.html" style="padding:6px 12px;font-size:13px">
+                  Review Workpaper
+                </a>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <div id="reports" class="card col-12">
-        <h3 style="margin:0 0 10px 0;">Reports</h3>
-        <p class="footer">Export combined workpapers + reviews as PDF (demo only).</p>
-        <a class="btn" href="#" onclick="notImplemented(event)">Download PDF</a>
+        <h3>Reports & Documentation</h3>
+        <p class="footer">Generate compliance reports and export workpapers for external review.</p>
+        <div style="margin-top:20px;display:flex;gap:12px">
+          <a class="btn" href="#" onclick="notImplemented(event)">📊 Q4 SOX Report</a>
+          <a class="btn" href="#" onclick="notImplemented(event)">📈 Control Matrix</a>
+          <a class="btn" href="#" onclick="notImplemented(event)">📋 Audit Trail</a>
+        </div>
       </div>
     </section>
   </main>
 </div>
 <div id="toast" class="toast"></div>
 <script>
-function toast(msg, ms=1800){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',ms)}
-function notImplemented(e){e.preventDefault();toast('Demo-only: this is a static mockup.')}
+function toast(msg, ms=2000){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',ms)
+}
+function notImplemented(e){
+  e.preventDefault();
+  toast('This feature is coming soon!')
+}
 </script>
 </body></html>
