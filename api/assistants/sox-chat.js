@@ -23,6 +23,33 @@ async function loadDataFiles() {
   }
 }
 
+// Extract user IDs from message
+function extractUserIds(message) {
+  // Match patterns like u1001, u1002, etc.
+  const userIdPattern = /u\d{4}/gi;
+  const matches = message.match(userIdPattern);
+  return matches ? [...new Set(matches.map(id => id.toLowerCase()))] : [];
+}
+
+// Filter data to only relevant users
+function filterDataForUsers(adData, hrData, userIds) {
+  if (!adData || !hrData || userIds.length === 0) {
+    return { filteredAD: null, filteredHR: null };
+  }
+  
+  const filteredAD = {
+    ...adData,
+    users: adData.users.filter(user => userIds.includes(user.user_id.toLowerCase()))
+  };
+  
+  const filteredHR = {
+    ...hrData,
+    terminations: hrData.terminations.filter(term => userIds.includes(term.user_id.toLowerCase()))
+  };
+  
+  return { filteredAD, filteredHR };
+}
+
 async function waitForRun(openai, threadId, runId) {
   let run;
   let attempts = 0;
@@ -86,29 +113,43 @@ export default async function handler(req, res) {
       threads.set(sessionId, threadId);
     }
     
+    // Extract user IDs from the message
+    const userIds = extractUserIds(message);
+    
     // Check if this is the first message in the thread
     const existingMessages = await openai.beta.threads.messages.list(threadId);
     const isFirstMessage = existingMessages.data.length === 0;
     
     let enhancedMessage = message;
     
-    // If it's the first message, load and prepend data
-    if (isFirstMessage) {
+    // If it's the first message and we found user IDs, load and filter data
+    if (isFirstMessage && userIds.length > 0) {
       const { adData, hrData } = await loadDataFiles();
       
       if (adData && hrData) {
-        enhancedMessage = `
-Here is the data for the audit:
+        // Filter data to only include requested users
+        const { filteredAD, filteredHR } = filterDataForUsers(adData, hrData, userIds);
+        
+        if (filteredAD && filteredHR) {
+          // Create a simplified data context
+          enhancedMessage = `
+I need you to audit the following terminated users for SOX compliance.
 
-ACTIVE DIRECTORY DATA:
-${JSON.stringify(adData, null, 2)}
+The requirement is that user accounts must be disabled within 10 minutes of termination.
 
-HR TERMINATION REPORT:
-${JSON.stringify(hrData, null, 2)}
+RELEVANT ACTIVE DIRECTORY DATA:
+${JSON.stringify(filteredAD, null, 2)}
+
+RELEVANT HR TERMINATION DATA:
+${JSON.stringify(filteredHR, null, 2)}
 
 USER REQUEST:
-${message}`;
-        console.log('Added data context to SOX auditor message');
+${message}
+
+Please analyze if each user's account was disabled within 10 minutes of termination and provide a compliance report.`;
+          
+          console.log(`Filtered data to ${userIds.length} users for SOX audit`);
+        }
       }
     }
 

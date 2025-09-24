@@ -46,22 +46,46 @@ export class SOXAssistantManager extends AssistantManager {
     
     let enhancedMessage = message;
     
-    // If it's the first message and we have data, prepend it
-    if (isFirstMessage && this.activeDirectoryData && this.hrTerminationData) {
+    // Extract user IDs from message
+    const userIdPattern = /u\d{4}/gi;
+    const matches = message.match(userIdPattern);
+    const userIds = matches ? [...new Set(matches.map(id => id.toLowerCase()))] : [];
+    
+    // If it's the first message and we have data, filter and prepend it
+    if (isFirstMessage && userIds.length > 0 && this.activeDirectoryData && this.hrTerminationData) {
+      // Filter data to only requested users
+      const filteredAD = {
+        ...this.activeDirectoryData,
+        users: this.activeDirectoryData.users.filter(user => 
+          userIds.includes(user.user_id.toLowerCase())
+        )
+      };
+      
+      const filteredHR = {
+        ...this.hrTerminationData,
+        terminations: this.hrTerminationData.terminations.filter(term => 
+          userIds.includes(term.user_id.toLowerCase())
+        )
+      };
+      
       const dataContext = `
-Here is the data for the audit:
+I need you to audit the following terminated users for SOX compliance.
 
-ACTIVE DIRECTORY DATA:
-${JSON.stringify(this.activeDirectoryData, null, 2)}
+The requirement is that user accounts must be disabled within 10 minutes of termination.
 
-HR TERMINATION REPORT:
-${JSON.stringify(this.hrTerminationData, null, 2)}
+RELEVANT ACTIVE DIRECTORY DATA:
+${JSON.stringify(filteredAD, null, 2)}
+
+RELEVANT HR TERMINATION DATA:
+${JSON.stringify(filteredHR, null, 2)}
 
 USER REQUEST:
-${message}`;
+${message}
+
+Please analyze if each user's account was disabled within 10 minutes of termination and provide a compliance report.`;
       
       enhancedMessage = dataContext;
-      console.log('📊 Added data context to SOX auditor message');
+      console.log(`📊 Filtered data to ${userIds.length} users for SOX audit`);
     }
     
     // Add user message to thread
