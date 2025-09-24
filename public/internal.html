@@ -75,13 +75,15 @@ a{color:inherit;text-decoration:none}
   width:40px;
   height:40px;
   border-radius:10px;
-  background:linear-gradient(135deg, var(--primary), var(--primary-light));
-  box-shadow:var(--shadow);
   display:flex;
   align-items:center;
   justify-content:center;
-  color:white;
-  font-size:20px;
+}
+
+.logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
 }
 
 .brand h1{
@@ -413,7 +415,7 @@ h4{
 <div class="app">
   <aside class="aside">
     <div class="brand">
-      <div class="logo">⚡</div>
+      <div class="logo"><img src="/logo.svg" alt="Clairvoyant GRC Logo"></div>
       <h1>Clairvoyant GRC</h1>
     </div>
     <nav class="nav">

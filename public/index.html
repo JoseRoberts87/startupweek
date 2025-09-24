@@ -269,6 +269,14 @@
             justify-content: center;
             margin-bottom: 24px;
             font-size: 32px;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .assistant-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: currentColor;
         }
 
         .assistant-name {
@@ -285,18 +293,24 @@
         }
 
         .assistant-features {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 8px;
             margin-bottom: 24px;
+            min-height: 60px;
         }
 
         .feature-tag {
-            padding: 4px 12px;
+            padding: 6px 12px;
             background: var(--background);
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--gray);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
         }
 
         .launch-button {
@@ -438,7 +452,7 @@
     <header class="header">
         <nav class="nav-container">
             <a href="/" class="logo">
-                <div class="logo-icon">⚡</div>
+                <img src="/logo.svg" alt="Clairvoyant GRC Logo" style="height: 40px; width: auto;">
                 <span>Clairvoyant GRC</span>
             </a>
             <div class="nav-links">
@@ -554,17 +568,25 @@
     </footer>
 
     <script>
+        // SVG Icons
+        const svgIcons = {
+            'sox-auditor': `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 13h2v8H3zm4-8h2v16H7zm4-2h2v18h-2zm4 4h2v14h-2zm4-2h2v16h-2z"/>
+            </svg>`,
+            'big4-reviewer': `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>`
+        };
+
         // Assistant data
         const assistantData = {
             'sox-auditor': {
                 name: 'SOX Compliance Auditor',
-                icon: '📊',
                 description: 'Automated control testing and evidence analysis for SOX compliance.',
                 features: ['Control Testing', 'CSV Analysis', 'Exception Tracking', 'Workpaper Generation']
             },
             'big4-reviewer': {
                 name: 'Big 4 External Reviewer',
-                icon: '🔍',
                 description: 'Professional skepticism and detailed workpaper review with risk assessment.',
                 features: ['Workpaper Review', 'Risk Assessment', 'Issue Identification', 'Remediation Guidance']
             }
@@ -635,8 +657,11 @@
             const card = document.createElement('div');
             card.className = 'assistant-card';
             
+            // Get SVG icon or use default
+            const iconSVG = svgIcons[key] || svgIcons['sox-auditor'];
+            
             card.innerHTML = `
-                <div class="assistant-icon">${data.icon}</div>
+                <div class="assistant-icon">${iconSVG}</div>
                 <h3 class="assistant-name">${data.name}</h3>
                 <p class="assistant-description">${data.description}</p>
                 <div class="assistant-features">
