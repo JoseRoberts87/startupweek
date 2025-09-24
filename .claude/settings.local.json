@@ -25,7 +25,10 @@
       "WebFetch(domain:www.clairvoyantgrc.com)",
       "Bash(PORT=3006 node src/servers/multi-assistant-server.js)",
       "Bash(PORT=3007 node src/servers/multi-assistant-server.js)",
-      "Bash(npm run setup:sox:*)"
+      "Bash(npm run setup:sox:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

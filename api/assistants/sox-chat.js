@@ -1,7 +1,27 @@
 import OpenAI from 'openai';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 // Store threads in memory (Note: In production, use a database)
 const threads = new Map();
+
+// Load data files
+async function loadDataFiles() {
+  try {
+    const dataDir = path.join(process.cwd(), 'data');
+    
+    // Load Active Directory data
+    const adData = JSON.parse(await fs.readFile(path.join(dataDir, 'active_directory.json'), 'utf8'));
+    
+    // Load HR Termination Report
+    const hrData = JSON.parse(await fs.readFile(path.join(dataDir, 'hr_termination_report.json'), 'utf8'));
+    
+    return { adData, hrData };
+  } catch (error) {
+    console.error('Could not load data files:', error);
+    return { adData: null, hrData: null };
+  }
+}
 
 async function waitForRun(openai, threadId, runId) {
   let run;
@@ -65,11 +85,37 @@ export default async function handler(req, res) {
       threadId = thread.id;
       threads.set(sessionId, threadId);
     }
+    
+    // Check if this is the first message in the thread
+    const existingMessages = await openai.beta.threads.messages.list(threadId);
+    const isFirstMessage = existingMessages.data.length === 0;
+    
+    let enhancedMessage = message;
+    
+    // If it's the first message, load and prepend data
+    if (isFirstMessage) {
+      const { adData, hrData } = await loadDataFiles();
+      
+      if (adData && hrData) {
+        enhancedMessage = `
+Here is the data for the audit:
+
+ACTIVE DIRECTORY DATA:
+${JSON.stringify(adData, null, 2)}
+
+HR TERMINATION REPORT:
+${JSON.stringify(hrData, null, 2)}
+
+USER REQUEST:
+${message}`;
+        console.log('Added data context to SOX auditor message');
+      }
+    }
 
     // Add message to thread
     await openai.beta.threads.messages.create(threadId, {
       role: 'user',
-      content: message
+      content: enhancedMessage
     });
 
     // Run the assistant
