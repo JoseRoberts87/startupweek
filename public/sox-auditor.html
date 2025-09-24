@@ -245,7 +245,7 @@
         <div class="header">
             <div class="header-info">
                 <h1><img src="/logo.svg" alt="Clairvoyant GRC Logo" style="height: 32px; width: auto; vertical-align: middle; margin-right: 12px;">SOX Compliance Auditor</h1>
-                <div class="assistant-info">Senior internal auditor specializing in SOX compliance</div>
+                <div class="assistant-info">User termination control testing - 10 minute compliance validation</div>
             </div>
             <button class="back-button" onclick="window.location.href='/'">← Back to Hub</button>
         </div>
@@ -253,8 +253,11 @@
         <div class="chat-container" id="chatContainer">
             <div class="message system">
                 <div class="message-content">
-                    Welcome! I'm your SOX Compliance Auditor. I can help you test controls and analyze CSV data. 
-                    Provide me with control data and I'll return structured JSON results with workpapers, findings, and exception rates.
+                    Welcome! I'm your SOX Compliance Auditor specializing in user termination controls. 
+                    
+                    I will audit whether terminated employees' Active Directory accounts are disabled within 10 minutes of termination.
+                    
+                    Please provide a list of terminated user IDs (e.g., u1001, u1002, u1003) to audit.
                 </div>
             </div>
         </div>
@@ -262,7 +265,7 @@
         <div class="input-container">
             <textarea 
                 id="messageInput" 
-                placeholder="Paste your CSV data or describe the control test..." 
+                placeholder="Enter user IDs to audit (e.g., u1001, u1002, u1003)" 
                 autocomplete="off"
                 rows="1"
             ></textarea>
@@ -341,7 +344,7 @@
             const loadingMessage = addMessage('', 'loading', 'SOX Auditor');
             
             try {
-                const response = await fetch('/api/assistants/sox-chat', {
+                const response = await fetch('/api/assistants/sox-auditor/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

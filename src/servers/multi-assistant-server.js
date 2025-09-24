@@ -5,6 +5,7 @@ import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { AssistantManager } from '../../assistants/shared/base-assistant.js';
+import { SOXAssistantManager } from '../../assistants/sox-auditor/manager.js';
 import { AssistantRegistry } from '../../assistants/shared/assistant-registry.js';
 import { setupSOXAssistant } from '../../assistants/sox-auditor/setup.js';
 import { setupBig4Assistant } from '../../assistants/big4-reviewer/setup.js';
@@ -33,9 +34,9 @@ async function initializeAssistants() {
   console.log('\n🚀 Initializing Multi-Assistant Server...\n');
   
   try {
-    // Load SOX Auditor
+    // Load SOX Auditor with specialized manager
     await registry.loadAssistant('sox-auditor', setupSOXAssistant, openai);
-    managers.set('sox-auditor', new AssistantManager(openai));
+    managers.set('sox-auditor', new SOXAssistantManager(openai));
     
     // Load Big 4 External Reviewer
     await registry.loadAssistant('big4-reviewer', setupBig4Assistant, openai);

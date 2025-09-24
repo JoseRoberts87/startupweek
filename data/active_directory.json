@@ -1,0 +1,87 @@
+{
+  "users": [
+    {
+      "user_id": "u1001",
+      "name": "Adam West",
+      "role": "AP Clerk",
+      "status": "ACTIVE",
+      "last_login": "2025-09-01",
+      "account_disabled_date": null
+    },
+    {
+      "user_id": "u1002",
+      "name": "Beth Clark",
+      "role": "Staff Accountant",
+      "status": "DISABLED",
+      "last_login": "2025-08-19",
+      "account_disabled_date": "2025-08-20T09:35:00"
+    },
+    {
+      "user_id": "u1003",
+      "name": "Chad Young",
+      "role": "Developer",
+      "status": "ACTIVE",
+      "last_login": "2025-08-12",
+      "account_disabled_date": null
+    },
+    {
+      "user_id": "u1004",
+      "name": "Dana Lee",
+      "role": "HR Analyst",
+      "status": "DISABLED",
+      "last_login": "2025-08-04",
+      "account_disabled_date": "2025-08-05T12:08:00"
+    },
+    {
+      "user_id": "u1005",
+      "name": "Evan Cole",
+      "role": "Finance Manager",
+      "status": "DISABLED",
+      "last_login": "2025-07-28",
+      "account_disabled_date": "2025-07-29T16:20:00"
+    },
+    {
+      "user_id": "u1010",
+      "name": "Frank Iero",
+      "role": "Controller",
+      "status": "ACTIVE",
+      "last_login": "2025-09-02",
+      "account_disabled_date": null
+    },
+    {
+      "user_id": "u1011",
+      "name": "Grace Li",
+      "role": "IT Admin",
+      "status": "ACTIVE",
+      "last_login": "2025-09-01",
+      "account_disabled_date": null
+    },
+    {
+      "user_id": "u1012",
+      "name": "Hank Boyd",
+      "role": "AR Specialist",
+      "status": "ACTIVE",
+      "last_login": "2025-09-01",
+      "account_disabled_date": null
+    },
+    {
+      "user_id": "u1013",
+      "name": "Ivy Chen",
+      "role": "AP Supervisor",
+      "status": "ACTIVE",
+      "last_login": "2025-09-03",
+      "account_disabled_date": null
+    },
+    {
+      "user_id": "u1014",
+      "name": "Jack Moss",
+      "role": "CIO",
+      "status": "ACTIVE",
+      "last_login": "2025-09-02",
+      "account_disabled_date": null
+    }
+  ],
+  "last_updated": "2025-09-03T10:00:00",
+  "system": "Active Directory",
+  "domain": "COMPANY.LOCAL"
+}

@@ -1,0 +1,79 @@
+{
+  "terminations": [
+    {
+      "user_id": "u1001",
+      "employee_name": "Adam West",
+      "termination_date_time": "2025-08-31T17:00:00",
+      "department": "Accounts Payable",
+      "termination_type": "Voluntary"
+    },
+    {
+      "user_id": "u1002",
+      "employee_name": "Beth Clark",
+      "termination_date_time": "2025-08-20T09:30:00",
+      "department": "Accounting",
+      "termination_type": "Involuntary"
+    },
+    {
+      "user_id": "u1003",
+      "employee_name": "Chad Young",
+      "termination_date_time": "2025-08-10T15:45:00",
+      "department": "IT",
+      "termination_type": "Voluntary"
+    },
+    {
+      "user_id": "u1004",
+      "employee_name": "Dana Lee",
+      "termination_date_time": "2025-08-05T12:00:00",
+      "department": "Human Resources",
+      "termination_type": "Voluntary"
+    },
+    {
+      "user_id": "u1005",
+      "employee_name": "Evan Cole",
+      "termination_date_time": "2025-07-29T16:15:00",
+      "department": "Finance",
+      "termination_type": "Involuntary"
+    },
+    {
+      "user_id": "u1010",
+      "employee_name": "Frank Iero",
+      "termination_date_time": "2025-08-28T17:45:00",
+      "department": "Finance",
+      "termination_type": "Voluntary"
+    },
+    {
+      "user_id": "u1011",
+      "employee_name": "Grace Li",
+      "termination_date_time": "2025-08-27T14:30:00",
+      "department": "IT",
+      "termination_type": "Voluntary"
+    },
+    {
+      "user_id": "u1012",
+      "employee_name": "Hank Boyd",
+      "termination_date_time": "2025-08-26T10:00:00",
+      "department": "Accounts Receivable",
+      "termination_type": "Involuntary"
+    },
+    {
+      "user_id": "u1013",
+      "employee_name": "Ivy Chen",
+      "termination_date_time": "2025-08-25T09:00:00",
+      "department": "Accounts Payable",
+      "termination_type": "Voluntary"
+    },
+    {
+      "user_id": "u1014",
+      "employee_name": "Jack Moss",
+      "termination_date_time": "2025-08-24T11:00:00",
+      "department": "IT",
+      "termination_type": "Voluntary"
+    }
+  ],
+  "report_generated": "2025-09-01T00:00:00",
+  "report_period": {
+    "start": "2025-07-01",
+    "end": "2025-08-31"
+  }
+}
