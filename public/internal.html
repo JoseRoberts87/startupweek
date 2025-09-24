@@ -790,8 +790,13 @@ async function submitTest() {
   submitBtnText.innerHTML = '<span class="loading-spinner"></span>Testing...';
   
   try {
+    // Determine the correct API URL
+    const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:3007/api/assistants/sox-auditor/chat'  // Local development
+      : '/api/assistants/sox-chat';  // Production on Vercel
+    
     // Call the SOX auditor API
-    const response = await fetch('/api/assistants/sox-chat', {
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -802,7 +807,15 @@ async function submitTest() {
       }),
     });
     
-    const data = await response.json();
+    let data;
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      console.error('Non-JSON response:', text);
+      throw new Error('Server returned invalid response. Please check if the API is running.');
+    }
     
     if (response.ok) {
       // Display results
