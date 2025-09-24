@@ -26,7 +26,7 @@ async function loadDataFiles() {
 async function waitForRun(openai, threadId, runId) {
   let run;
   let attempts = 0;
-  const maxAttempts = 30;
+  const maxAttempts = 55;  // Set to 55 seconds to be safe with 60 second Vercel timeout
 
   while (attempts < maxAttempts) {
     run = await openai.beta.threads.runs.retrieve(threadId, runId);

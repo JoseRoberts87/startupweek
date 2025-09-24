@@ -28,7 +28,8 @@
       "Bash(npm run setup:sox:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:startupweek.vercel.app)"
     ],
     "deny": [],
     "ask": []

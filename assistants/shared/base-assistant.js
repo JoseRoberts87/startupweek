@@ -65,7 +65,7 @@ export class AssistantManager {
   async waitForRun(threadId, runId) {
     let run;
     let attempts = 0;
-    const maxAttempts = 30;
+    const maxAttempts = 60;  // Increased to 60 seconds for Pro plan
 
     while (attempts < maxAttempts) {
       run = await this.openai.beta.threads.runs.retrieve(threadId, runId);
